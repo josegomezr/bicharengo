@@ -54,7 +54,7 @@ class Bicharengo
 
     /**
     * ruta
-    * @param string [$metodo] Método HTTP 
+    * @param string [$metodo] Verbo HTTP 
     * @param string [$uri] Uri para enrutar.
     * @param callable [$manejador] Manejador para la ruta.
     *
@@ -73,69 +73,69 @@ class Bicharengo
 
     /**
     * set
-    * @param string [$key] nombre de la llave al guardar
-    * @param string [$value] Uri para enrutar.
+    * @param string [$clave] nombre de la clave al guardar
+    * @param string [$valor] Uri para enrutar.
     *
     * Guarda un valor dentro del framework (almacenamiento volatil, no persiste).
     */
-    public function set($key, $value)
+    public function set($clave, $valor)
     {
-        $this->_vars[$key] = $value;
+        $this->_vars[$clave] = $valor;
     }
 
     /**
     * get
-    * @param string [$key] nombre de la llave al guardar
+    * @param string [$clave] nombre de la clave al guardar
     * @return mixed
     *
     * Obtiene un valor dentro del framework (almacenamiento volatil, no persiste).
     */
-    public function get($key)
+    public function get($clave)
     {
-        return $this->_vars[$key];
+        return $this->_vars[$clave];
     }
 
     /**
     * get
-    * @param string [$which] superglobal de la cual fijar la entrada.
-    * @param string [$key] nombre de la clave
-    * @param string [$default_value = null] valor por defecto para usar en caso
-    * de no existir la llave en la superglobal
+    * @param string [$superglobal] superglobal de la cual fijar la entrada.
+    * @param string [$clave] nombre de la clave
+    * @param string [$valor_defecto = null] valor por defecto para usar en caso
+    * de no existir la clave en la superglobal
     * @return mixed
     *
     * Obtiene una variable de entrada.
     */
-    public function entrada($which, $key, $default_value = null)
+    public function entrada($superglobal, $clave, $valor_defecto = null)
     {
-        $superglobal = null;
-        switch ($which) {
+        $sg = null;
+        switch ($superglobal) {
             case 'get':
-                $superglobal = $_GET;
+                $sg = $_GET;
             break;
             case 'post':
-                $superglobal = $_POST;
+                $sg = $_POST;
             break;
             case 'request':
-                $superglobal = $_REQUEST;
+                $sg = $_REQUEST;
             break;
             case 'cookie':
-                $superglobal = $_COOKIE;
+                $sg = $_COOKIE;
             break;
             case 'session':
-                $superglobal = $_SESSION;
+                $sg = $_SESSION;
             break;
             case 'server':
-                $superglobal = $_SERVER;
+                $sg = $_SERVER;
             break;
             default:
                 exit("superglobal mala");
             break;
         }
 
-        if (isset($superglobal[$key])) {
-            return $superglobal[$key];
+        if (isset($sg[$clave])) {
+            return $sg[$clave];
         }else{
-            return $default_value;
+            return $valor_defecto;
         }
     }
 

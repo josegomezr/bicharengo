@@ -1,6 +1,8 @@
 # bicharengo
 PHP Micro-framework compatible con php >= 5.2
 
+## [API](API.md)
+
 ## Uso
 
 ```php
