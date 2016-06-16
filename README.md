@@ -8,13 +8,13 @@ PHP Micro-framework compatible con php >= 5.2
 
 require('../vendor/autoload.php');
 
-$vaina = Bicharengo::instance();
+$vaina = Bicharengo::instancia();
 
-function handler_get_ab($app)
+function manejador_ab($app)
 {
     echo $app->entrada('get', 'a', 'no hay naida');
 }
 
-$vaina->ruta('GET', '/ab', 'handler_get_ab');
+$vaina->ruta('GET', '/ab', 'manejador_ab');
 
 $vaina->run();

@@ -49,7 +49,7 @@ class Bicharengo
     * ruta
     * @param string [$metodo] Método HTTP 
     * @param string [$uri] Uri para enrutar.
-    * @param string [$manejador] Manejador para la ruta.
+    * @param callable [$manejador] Manejador para la ruta.
     *
     * Registra una ruta para ser llamada por el enrutador.
     */
