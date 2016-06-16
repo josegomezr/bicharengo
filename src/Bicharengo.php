@@ -9,6 +9,13 @@
 class Bicharengo
 {
     /**
+    * __construct
+    *
+    * Constructor privado para forzar el singleton.
+    */
+    private function __construct(){}
+
+    /**
     * $_instancia
     * @staticvar Bicharengo
     *
