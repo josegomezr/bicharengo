@@ -28,17 +28,17 @@ class Bicharengo
     * $_rutas
     * @var array
     *
-    * Guarda las rutas registradas para el router.
+    * Guarda las rutas registradas para el enrutador.
     */
     protected $_rutas = array();
 
     /**
-    * instance
+    * instancia
     * @return Bicharengo
     *
     * Genera o obtiene la primera y unica instancia valida de esta clase.
     */
-    static function instance(){
+    static function instancia(){
         if (self::$_instancia == null) {
             self::$_instancia = new self();
         }
@@ -46,14 +46,14 @@ class Bicharengo
     }
 
     /**
-    * instance
+    * ruta
     * @param string [$metodo] Método HTTP 
     * @param string [$uri] Uri para enrutar.
     * @param string [$manejador] Manejador para la ruta.
     *
     * Registra una ruta para ser llamada por el enrutador.
     */
-    public function route($metodo, $uri, $manejador)
+    public function ruta($metodo, $uri, $manejador)
     {
         if(!is_callable($manejador)){
             exit("que es esto?!");
@@ -98,7 +98,7 @@ class Bicharengo
     *
     * Obtiene una variable de entrada.
     */
-    public function input($which, $key, $default_value = null)
+    public function entrada($which, $key, $default_value = null)
     {
         $superglobal = null;
         switch ($which) {
