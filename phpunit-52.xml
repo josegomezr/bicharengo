@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.7/phpunit.xsd"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="false"
+         bootstrap="tests-52/bootstrap.php">
+    <testsuites>
+        <testsuite name="PHP 5.2 Test Suite">
+            <directory>./tests-5.2/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

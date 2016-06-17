@@ -1,3 +1,4 @@
 /vendor/
 /prueba/
 *.sublime-*
+composer.lock

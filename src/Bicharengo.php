@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 
 /**
@@ -13,15 +13,16 @@ class Bicharengo
     *
     * Force singleton by making __construct private.
     */
-    private function __construct(){}
+    private function __construct() {
+    }
 
     /**
     * $_instance
     * @staticvar Bicharengo
     *
-    * Storage for our only instance of Bicharengo 
+    * Storage for our only instance of Bicharengo
     */
-    static $_instance = null;
+    public static $_instance = null;
 
     /**
     * $_vars
@@ -45,7 +46,7 @@ class Bicharengo
     *
     * Builds up Bicharengo
     */
-    static function build(){
+    public static function build() {
         if (self::$_instance == null) {
             self::$_instance = new self();
         }
@@ -54,30 +55,35 @@ class Bicharengo
 
     /**
     * route
-    * @param string [$method] HTTP Verb 
+    * @param string [$method] HTTP Verb
     * @param string [$uri] uri pattern to match
     * @param callable [$handler] callable to handle the route.
     *
     * Register a route
     */
-    public function route($method, $uri, $handler)
-    {
+    public function route($method, $uri, $handler) {
+    
         if (is_callable($handler)) {
             $handler = array('callable', $handler);
-        } else if (strstr($handler, '->') !== FALSE) {
-            $handler = explode('->', $handler);
-            array_unshift($handler, 'instance');
-        } else if (strstr($handler, '::') !== FALSE) {
-            $handler = explode('::', $handler);
-            array_unshift($handler, 'static');
-        }else{
+        } elseif (is_string($handler)) {
+            if (strstr($handler, '->') !== false) {
+                $handler = explode('->', $handler);
+                array_unshift($handler, 'instance');
+            } elseif (strstr($handler, '::') !== false) {
+                $handler = explode('::', $handler);
+                array_unshift($handler, 'static');
+            else{
+                exit("not a callable!");
+            }
+        } else {
             exit("not a callable!");
         }
 
         $method = strtoupper($method);
         
-        if(!isset($this->_routes[$method]))
+        if (!isset($this->_routes[$method])) {
             $this->_routes[$method] = array();
+        }
         
         $this->_routes[$method][$uri] = $handler;
     }
@@ -89,8 +95,8 @@ class Bicharengo
     *
     * Store a value, then will be accesible globally within the app
     */
-    public function set($key, $value)
-    {
+    public function set($key, $value) {
+    
         $this->_vars[$key] = $value;
     }
 
@@ -101,8 +107,8 @@ class Bicharengo
     *
     * Get a value stored withint the app
     */
-    public function get($key)
-    {
+    public function get($key) {
+    
         return $this->_vars[$key];
     }
 
@@ -115,28 +121,28 @@ class Bicharengo
     *
     * Get an input var.
     */
-    public function input($superglobal, $key, $default = null)
-    {
+    public function input($superglobal, $key, $default = null) {
+    
         $sg = null;
         switch ($superglobal) {
             case 'get':
                 $sg = $_GET;
-            break;
+                break;
             case 'post':
                 $sg = $_POST;
-            break;
+                break;
             case 'request':
                 $sg = $_REQUEST;
-            break;
+                break;
             case 'cookie':
                 $sg = $_COOKIE;
-            break;
+                break;
             case 'session':
                 $sg = $_SESSION;
-            break;
+                break;
             case 'server':
                 $sg = $_SERVER;
-            break;
+                break;
             default:
                 exit("superglobal mala");
             break;
@@ -144,7 +150,7 @@ class Bicharengo
 
         if (isset($sg[$key])) {
             return $sg[$key];
-        }else{
+        } else {
             return $default;
         }
     }
@@ -154,8 +160,8 @@ class Bicharengo
     *
     * Run this app.
     */
-    public function run()
-    {
+    public function run() {
+    
         $path = '/';
         if (isset($_SERVER['PATH_INFO'])) {
             $path = $_SERVER['PATH_INFO'];
@@ -168,7 +174,7 @@ class Bicharengo
 
         if (isset($routes[$path])) {
             $handler = $routes[$path];
-        }else{
+        } else {
             $placeholders = array(
                 ':alpha:' => '([a-zA-Z]+)',
                 ':num:' => '([0-9]+)',
@@ -197,16 +203,16 @@ class Bicharengo
         switch ($handler_type) {
             case 'callable':
                 $response = call_user_func_array($handler[0], array($this));
-            break;
+                break;
             case 'static':
                 $response = call_user_func_array($handler, array($this));
-            break;
+                break;
             case 'instance':
                 $reflectedClass = new ReflectionClass($handler[0]);
                 $instance = $reflectedClass->newInstance();
                 $handler[0] = $instance;
                 $response = call_user_func_array($handler, array($this));
-            break;
+                break;
         }
 
         exit($response);
