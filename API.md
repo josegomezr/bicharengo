@@ -17,7 +17,7 @@ Registra una ruta en la app.
 * `:any:`: concuerda con **CUALQUIER COSA**.
 
 Los *placeholders* o expresiones regulares interpretadas son accesadas como
-un arreglo almacenado en `uri_vars`. (véase `.get($key)`) 
+un arreglo almacenado en `uri_segments`. (véase `.get($key)`) 
 
 `$handler` puede ser especificado de las siguientes formas:
 * Callable Simple, ex: `'nombre_funcion'`
