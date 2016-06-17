@@ -1,5 +1,6 @@
 <?php 
 
+
 /**
 * Bicharengo
 * @package Bicharengo
@@ -63,10 +64,12 @@ class Bicharengo
     {
         if (is_callable($handler)) {
             $handler = array('callable', $handler);
-        } else if (strstr($handler, '->') === FALSE) {
-            $handler = array('instance', $handler);
-        } else if (strstr($handler, '::') === FALSE) {
-            $handler = array('static', $handler);
+        } else if (strstr($handler, '->') !== FALSE) {
+            $handler = explode('->', $handler);
+            array_unshift($handler, 'instance');
+        } else if (strstr($handler, '::') !== FALSE) {
+            $handler = explode('::', $handler);
+            array_unshift($handler, 'static');
         }else{
             exit("not a callable!");
         }
@@ -153,7 +156,10 @@ class Bicharengo
     */
     public function run()
     {
-        $path = $_SERVER['PATH_INFO'];
+        $path = '/';
+        if (isset($_SERVER['PATH_INFO'])) {
+            $path = $_SERVER['PATH_INFO'];
+        }
         $method = $_SERVER['REQUEST_METHOD'];
         $routes = $this->_routes[$method];
 
@@ -187,11 +193,14 @@ class Bicharengo
         switch ($handler_type) {
             case 'callable':
                 $response = call_user_func_array($handler[0], array($this));
+            break;
             case 'static':
                 $response = call_user_func_array($handler, array($this));
             break;
             case 'instance':
-                $cls = new $handler[0];
+                $reflectedClass = new ReflectionClass($handler[0]);
+                $instance = $reflectedClass->newInstance();
+                $handler[0] = $instance;
                 $response = call_user_func_array($handler, array($this));
             break;
         }
