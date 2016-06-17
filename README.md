@@ -10,13 +10,29 @@ PHP Micro-framework compatible con php >= 5.2
 
 require('../vendor/autoload.php');
 
-$vaina = Bicharengo::instancia();
+$vaina = Bicharengo::build();
 
-function manejador_ab($app)
+function home_hdl($app)
 {
-    echo $app->entrada('get', 'a', 'no hay naida');
+    echo 'home!';
 }
 
-$vaina->ruta('GET', '/ab', 'manejador_ab');
+class Greater{
+    public function hello_foo($app)
+    {
+        $name = $app->input('get', 'name', 'foo');
+        echo 'Hello ' . $name . '!';
+    }
+
+    public static function hello_static ($app){
+        $name = $app->input('get', 'name', 'foo');
+        echo 'STATIC HELLO: ' . $name . '!!!';
+    } 
+}
+
+
+$vaina->route('GET', '/', 'home_hdl');
+$vaina->route('GET', '/hello', 'Greater->hello_foo');
+$vaina->route('GET', '/static_hello', 'Greater::hello_static');
 
 $vaina->run();
