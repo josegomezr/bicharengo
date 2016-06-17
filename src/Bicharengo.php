@@ -4,108 +4,115 @@
 * Bicharengo
 * @package Bicharengo
 *
-* Clase principal de este cacharro.
 */
 class Bicharengo
 {
     /**
     * __construct
     *
-    * Constructor privado para forzar el singleton.
+    * Force singleton by making __construct private.
     */
     private function __construct(){}
 
     /**
-    * $_instancia
+    * $_instance
     * @staticvar Bicharengo
     *
-    * Guarda la instancia actual del framework.
+    * Storage for our only instance of Bicharengo 
     */
-    static $_instancia = null;
+    static $_instance = null;
 
     /**
     * $_vars
     * @var array
     *
-    * Guarda las variables globales dentro del framework.
+    * This is gonna be our storage for passing data across the app.
     */
     protected $_vars = array();
 
     /**
-    * $_rutas
+    * $_routes
     * @var array
     *
-    * Guarda las rutas registradas para el enrutador.
+    * Storage for routes
     */
-    protected $_rutas = array();
+    protected $_routes = array();
 
     /**
-    * instancia
+    * build
     * @return Bicharengo
     *
-    * Genera o obtiene la primera y unica instancia valida de esta clase.
+    * Builds up Bicharengo
     */
-    static function instancia(){
-        if (self::$_instancia == null) {
-            self::$_instancia = new self();
+    static function build(){
+        if (self::$_instance == null) {
+            self::$_instance = new self();
         }
-        return self::$_instancia;
+        return self::$_instance;
     }
 
     /**
-    * ruta
-    * @param string [$metodo] Verbo HTTP 
-    * @param string [$uri] Uri para enrutar.
-    * @param callable [$manejador] Manejador para la ruta.
+    * route
+    * @param string [$method] HTTP Verb 
+    * @param string [$uri] uri pattern to match
+    * @param callable [$handler] callable to handle the route.
     *
-    * Registra una ruta para ser llamada por el enrutador.
+    * Register a route
     */
-    public function ruta($metodo, $uri, $manejador)
+    public function route($method, $uri, $handler)
     {
-        if(!is_callable($manejador)){
-            exit("que es esto?!");
+        if (is_callable($handler)) {
+            $handler = array('callable', $handler);
+        } else if (strstr($handler, '->') === FALSE) {
+            $handler = array('instance', $handler);
+        } else if (strstr($handler, '::') === FALSE) {
+            $handler = array('static', $handler);
+        }else{
+            exit("not a callable!");
         }
-        $metodo = strtoupper($metodo);
-        if(!isset($this->_rutas[$metodo]))
-            $this->_rutas[$metodo] = array();
-        $this->_rutas[$metodo][$uri] = $manejador;
+
+        $method = strtoupper($method);
+        
+        if(!isset($this->_routes[$method]))
+            $this->_routes[$method] = array();
+        
+        $this->_routes[$method][$uri] = $handler;
     }
 
     /**
     * set
-    * @param string [$clave] nombre de la clave al guardar
-    * @param string [$valor] Uri para enrutar.
+    * @param string [$key] key name
+    * @param string [$value] value to store
     *
-    * Guarda un valor dentro del framework (almacenamiento volatil, no persiste).
+    * Store a value, then will be accesible globally within the app
     */
-    public function set($clave, $valor)
+    public function set($key, $value)
     {
-        $this->_vars[$clave] = $valor;
+        $this->_vars[$key] = $value;
     }
 
     /**
     * get
-    * @param string [$clave] nombre de la clave al guardar
+    * @param string [$key] nombre de la key al guardar
     * @return mixed
     *
-    * Obtiene un valor dentro del framework (almacenamiento volatil, no persiste).
+    * Get a value stored withint the app
     */
-    public function get($clave)
+    public function get($key)
     {
-        return $this->_vars[$clave];
+        return $this->_vars[$key];
     }
 
     /**
-    * get
-    * @param string [$superglobal] superglobal de la cual fijar la entrada.
-    * @param string [$clave] nombre de la clave
-    * @param string [$valor_defecto = null] valor por defecto para usar en caso
-    * de no existir la clave en la superglobal
+    * input
+    * @param string [$superglobal] superglobal to look in.
+    * @param string [$key] key name
+    * @param string [$default = null] default value if key is not present.
     * @return mixed
     *
-    * Obtiene una variable de entrada.
+    * Get an input var.
     */
-    public function entrada($superglobal, $clave, $valor_defecto = null)
+    public function input($superglobal, $key, $default = null)
     {
         $sg = null;
         switch ($superglobal) {
@@ -132,30 +139,63 @@ class Bicharengo
             break;
         }
 
-        if (isset($sg[$clave])) {
-            return $sg[$clave];
+        if (isset($sg[$key])) {
+            return $sg[$key];
         }else{
-            return $valor_defecto;
+            return $default;
         }
     }
 
     /**
     * run
     *
-    * Ejecuta la aplicacion.
+    * Run this app.
     */
     public function run()
     {
         $path = $_SERVER['PATH_INFO'];
-        $metodo = $_SERVER['REQUEST_METHOD'];
-        $rutas = $this->_rutas[$metodo];
+        $method = $_SERVER['REQUEST_METHOD'];
+        $routes = $this->_routes[$method];
 
-        if (isset($rutas[$path])) {
-            $manejador = $rutas[$path];
-            call_user_func_array($manejador, array($this));
-            return;
+        $handler = null;
+        $uri_matches = array();
+
+        if (isset($routes[$path])) {
+            $handler = $routes[$path];
+        }else{
+            $placeholders = array(
+                ':string:' => '([a-zA-Z]+)',
+                ':num:' => '([0-9]+)',
+                ':any:' => '(.*)'
+            );
+
+            foreach ($routes as $uri_pattern => $callable) {
+                $uri_pattern = strtr($uri_pattern, $placeholders);
+                if (preg_match('#^/?' . $uri_pattern . '/?$#', $path, $matches)) {
+                    $handler = $callable;
+                    $uri_matches = $matches;
+                    break;
+                }
+            }
+        }
+        if ($handler === null) {
+            exit('404');
         }
 
-        exit("error 404");
+        $response = null;
+        $handler_type = array_shift($handler);
+        switch ($handler_type) {
+            case 'callable':
+                $response = call_user_func_array($handler[0], array($this));
+            case 'static':
+                $response = call_user_func_array($handler, array($this));
+            break;
+            case 'instance':
+                $cls = new $handler[0];
+                $response = call_user_func_array($handler, array($this));
+            break;
+        }
+
+        exit($response);
     }
 }
