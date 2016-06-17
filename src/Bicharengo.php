@@ -170,8 +170,9 @@ class Bicharengo
             $handler = $routes[$path];
         }else{
             $placeholders = array(
-                ':string:' => '([a-zA-Z]+)',
+                ':alpha:' => '([a-zA-Z]+)',
                 ':num:' => '([0-9]+)',
+                ':alphanum:' => '([a-zA-Z0-9]+)',
                 ':any:' => '(.*)'
             );
 
@@ -189,7 +190,7 @@ class Bicharengo
         }
 
         $this->set('uri_vars', $uri_vars);
-        
+
         $response = null;
         $handler_type = array_shift($handler);
         switch ($handler_type) {

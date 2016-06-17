@@ -10,6 +10,15 @@ Registra una ruta en la app.
 **$uri** `string` la URI que concordar.  
 **$handler** `callable` el handler que será ejecutado.
 
+`$uri` puede tener expresiones regulares o *placeholders* dinamicos como:
+* `:alpha:`: concuerda con caracteres alfabéticos `[a-zA-Z]`
+* `:num:`: concuerda con números `[0-9]`.
+* `:alphanum:`: concuerda alfanuméricos `[a-zA-Z0-9]`.
+* `:any:`: concuerda con **CUALQUIER COSA**.
+
+Los *placeholders* o expresiones regulares interpretadas son accesadas como
+un arreglo almacenado en `uri_vars`. (véase `.get($key)`) 
+
 `$handler` puede ser especificado de las siguientes formas:
 * Callable Simple, ex: `'nombre_funcion'`
 * Callable estático, ex: `'Clase::metodo_estatico'`
