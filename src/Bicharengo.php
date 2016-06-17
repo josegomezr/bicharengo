@@ -164,7 +164,7 @@ class Bicharengo
         $routes = $this->_routes[$method];
 
         $handler = null;
-        $uri_matches = array();
+        $uri_vars = array();
 
         if (isset($routes[$path])) {
             $handler = $routes[$path];
@@ -179,7 +179,7 @@ class Bicharengo
                 $uri_pattern = strtr($uri_pattern, $placeholders);
                 if (preg_match('#^/?' . $uri_pattern . '/?$#', $path, $matches)) {
                     $handler = $callable;
-                    $uri_matches = $matches;
+                    $uri_vars = $matches;
                     break;
                 }
             }
@@ -188,6 +188,8 @@ class Bicharengo
             exit('404');
         }
 
+        $this->set('uri_vars', $uri_vars);
+        
         $response = null;
         $handler_type = array_shift($handler);
         switch ($handler_type) {
